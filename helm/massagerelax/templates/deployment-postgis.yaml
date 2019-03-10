@@ -1,0 +1,28 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: postgis
+  labels:
+    app: postgis
+spec:
+  template:
+    metadata:
+      labels:
+        app: postgis
+    spec:
+      containers:
+      - name: postgis
+        image: mdillon/postgis:latest
+        envFrom:
+        - configMapRef:
+            name: postgis
+        ports:
+        - containerPort: 5432
+          name: postgis
+        volumeMounts:
+        - name: postgisdb
+          mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgisdb
+          persistentVolumeClaim:
+            claimName: postgis-pv-claim

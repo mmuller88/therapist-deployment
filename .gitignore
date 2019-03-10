@@ -24,3 +24,7 @@ target
 /nbdist/
 /.nb-gradle/
 /build/
+
+helm/massagerelax/charts
+helm/massagerelax/requirements.lock
+helm/massagerelax*.tgz

@@ -1,5 +1,6 @@
 # Note: ...
-version: 2.0.0
+name: massagerelax
+version: 0.0.1
 appVersion: 0.0.1-SNAPSHOT
 description: A Helm chart for deploying Massagerelax
 keywords:
