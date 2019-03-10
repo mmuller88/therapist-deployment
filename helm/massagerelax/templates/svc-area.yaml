@@ -12,4 +12,3 @@ spec:
 #      name: therapist-area
   selector:
     app: therapist-area
-    release: {{ .Release.Name }}
