@@ -1,0 +1,10 @@
+# Note: ...
+version: 2.0.0
+appVersion: 0.0.1-SNAPSHOT
+description: A Helm chart for deploying Massagerelax
+keywords:
+- massage
+home: https://www.martin--mueller.com
+sources:
+- https://github.com/mmuller88/therapist-deployment
+#icon: https://
