@@ -6,6 +6,8 @@ services:
       - postgis
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgis:5432/therapist
+    ports:
+      - 8082:8082
 
   therapist:
     image: damadden88/therapist:latest

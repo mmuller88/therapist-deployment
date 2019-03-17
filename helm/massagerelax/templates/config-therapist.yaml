@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: therapist
+data:
+  SERVER_SERVLET_CONTEXT-PATH: {{ .Values.therapist.ingress.path }}
+  SPRING_DATASOURCE_USERNAME: massagerelax
+  SPRING_DATASOURCE_PASSWORD: massagerelax
+  SPRING_DATASOURCE_URL: jdbc:mysql://{{ printf "%s-%s" .Release.Name .Values.mysql.nameOverride }}:3306/massagerelax?useUnicode=yes&characterEncoding=UTF-8
+  AREA-SERVICE_HOST: "therapist-area"
+  AREA-SERVICE_PORT: "80"

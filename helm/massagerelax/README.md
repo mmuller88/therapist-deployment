@@ -37,7 +37,7 @@ To install the chart with the release name `my-massagerelax`:
 # Alfresco Database (Postgresql) password
 export DB_PWD='MyDbPwd'
 
-$ helm install --name my-massagerelax massagerelax-incubator/alfresco-content-services \
+$ helm install --name massagerelax massagerelax-incubator/alfresco-content-services \
                --set postgresql.postgresPassword="$DB_PWD"
 ```
 
@@ -50,7 +50,7 @@ The command deploys ACS Cluster on the Kubernetes cluster in the default configu
 To uninstall/delete the `my-acs` deployment:
 
 ```console
-$ helm delete my-acs --purge
+$ helm delete massagerelax --purge
 ```
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.

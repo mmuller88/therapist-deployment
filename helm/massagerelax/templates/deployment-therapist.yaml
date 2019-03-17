@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: therapist
+  labels:
+    app: therapist
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: therapist
+    spec:
+      containers:
+        - name: therapist
+          image: damadden88/therapist:latest
+          envFrom:
+            - configMapRef:
+                name: therapist
+          ports:
+            - containerPort: 8081

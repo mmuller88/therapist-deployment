@@ -9,6 +9,14 @@
 # If container memory is not explicitly set, then the above flags will default max heap to 1/4th of container's memory which may not be ideal.
 # Hence, setting up explicit Container memory and then assigning a percentage of it to the JVM for performance tuning.
 
+area:
+  ingress:
+    path: /area
+
+therapist:
+  ingress:
+    path: /therapist
+
 mysql:
   replicaCount: 1
   ## If true, install the mysql chart.
@@ -20,11 +28,11 @@ mysql:
   mysqlPassword: massagerelax
   mysqlDatabase: massagerelax
   mysqlRootPassword: massagerelax
-  persistence:
-    existingClaim: "alfresco-volume-claim"
-    subPath: "alfresco-content-services/database-data"
-  resources:
-    requests:
-      memory: "1500Mi"
-    limits:
-      memory: "1500Mi"
+#  persistence:
+#    existingClaim: "massagerelax-volume-claim"
+#    subPath: "massagerelax/database-data"
+#  resources:
+#    requests:
+#      memory: "1500Mi"
+#    limits:
+#      memory: "1500Mi"
