@@ -10,6 +10,7 @@ matrix:
   include:
   - name: "Docker Compose Test"
     before_install:
+      - cd docker-compose
       - docker-compose config
       - echo "Starting Massagereleax in Docker containers"
       - docker-compose ps
