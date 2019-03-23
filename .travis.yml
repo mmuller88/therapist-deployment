@@ -16,7 +16,8 @@ matrix:
       - docker-compose ps
       - docker-compose pull
       - docker-compose up -d
-      - WAIT_INTERVAL=1
+      - |
+        WAIT_INTERVAL=1
         COUNTER=0
         TIMEOUT=300
         t0=`date +%s`
