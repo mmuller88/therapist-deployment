@@ -10,10 +10,32 @@
 # Hence, setting up explicit Container memory and then assigning a percentage of it to the JVM for performance tuning.
 
 area:
+  replicaCount: 1
+  name: area
+  image:
+    repository: damadden88/therapist-area
+    tag: latest
+    pullPolicy: Always
+    internalPort: 8082
+  service:
+    name: area
+    type: ClusterIP
+    externalPort: 80
   ingress:
     path: /area
 
 therapist:
+  replicaCount: 1
+  name: therapist
+  image:
+    repository: damadden88/therapist
+    tag: latest
+    pullPolicy: Always
+    internalPort: 8081
+  service:
+    name: therapist
+    type: ClusterIP
+    externalPort: 80
   ingress:
     path: /therapist
 

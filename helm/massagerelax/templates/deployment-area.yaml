@@ -1,21 +1,22 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: therapist-area
+  name: {{ .Values.area.name }}
   labels:
-    app: therapist-area
+    app: {{ .Values.area.name }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.area.replicaCount }}
   template:
     metadata:
       labels:
-        app: therapist-area
+        app: {{ .Values.area.name }}
     spec:
       containers:
-        - name: therapist-area
-          image: damadden88/therapist-area:latest
+        - name: {{ .Values.area.name }}
+          image: "{{ .Values.area.image.repository }}:{{ .Values.area.image.tag }}"
+          imagePullPolicy: {{ .Values.area.image.pullPolicy }}
           envFrom:
             - configMapRef:
-                name: area
+                name: {{ .Values.area.name }}
           ports:
-            - containerPort: 8082
+            - containerPort: {{ .Values.area.image.internalPort }}

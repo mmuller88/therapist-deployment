@@ -1,17 +1,17 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: area
+  name: {{ .Values.area.name }}
   annotations:
     kubernetes.io/ingress.class: "nginx"
 spec:
   backend:
-    serviceName: therapist-area
-    servicePort: 80
+    serviceName: {{ .Values.area.name }}
+    servicePort: {{ .Values.area.service.externalPort }}
   rules:
     - http:
         paths:
           - path: {{ .Values.area.ingress.path }}
             backend:
-              serviceName: therapist-area
-              servicePort: 80
+              serviceName: {{ .Values.area.name }}
+              servicePort: {{ .Values.area.service.externalPort }}
