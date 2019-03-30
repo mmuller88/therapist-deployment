@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: therapist
+  name: {{ .Values.therapist.name }}
   labels:
-    app: therapist
+    app: {{ .Values.therapist.name }}
 spec:
-  type: ClusterIP
+  type: {{ .Values.therapist.service.type }}
   ports:
-    - port: 80
-      targetPort: 8081
+    - port: {{ .Values.therapist.service.externalPort }}
+      targetPort: {{ .Values.therapist.image.internalPort }}
 #      name: therapist
   selector:
-    app: therapist
+    app: {{ .Values.therapist.name }}

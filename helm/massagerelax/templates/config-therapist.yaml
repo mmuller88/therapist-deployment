@@ -3,13 +3,9 @@ kind: ConfigMap
 metadata:
   name: therapist
 data:
-  SERVER_SERVLET_CONTEXT-PATH: {{ .Values.therapist.ingress.path }}
+  THERAPIST_BASE_PATH: {{ .Values.therapist.ingress.path }}
   SPRING_DATASOURCE_USERNAME: {{ .Values.mysql.mysqlUser }}
   SPRING_DATASOURCE_PASSWORD: {{ .Values.mysql.mysqlPassword }}
   SPRING_DATASOURCE_URL: jdbc:mysql://{{ printf "%s-%s" .Release.Name .Values.mysql.nameOverride }}:3306/{{ .Values.mysql.mysqlDatabase }}?useUnicode=yes&characterEncoding=UTF-8
-  AREA-SERVICE_HOST: {{ .Values.area.name }}
-  area-service.host: {{ .Values.area.name }}
-  AREA-SERVICE_PORT: "80"
-  area-service.port: "80"
   LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: DEBUG
   LOGGING_LEVEL_ORG_HIBERNATE: ERROR

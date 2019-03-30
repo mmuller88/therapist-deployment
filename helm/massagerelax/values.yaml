@@ -14,13 +14,13 @@ area:
   name: area
   image:
     repository: damadden88/therapist-area
-    tag: latest
+    tag: feature-kubernetes-discovery
     pullPolicy: Always
     internalPort: 8082
   service:
     name: area
     type: ClusterIP
-    externalPort: 80
+    externalPort: 8082
   ingress:
     path: /area
 
@@ -29,7 +29,7 @@ therapist:
   name: therapist
   image:
     repository: damadden88/therapist
-    tag: latest
+    tag: feature-kubernetes-discovery
     pullPolicy: Always
     internalPort: 8081
   service:

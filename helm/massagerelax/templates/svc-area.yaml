@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: {{ .Values.area.name }}
   labels:
-    app: therapist
+    app: {{ .Values.area.name }}
 spec:
   type: {{ .Values.area.service.type }}
   ports:

@@ -3,5 +3,5 @@ kind: ConfigMap
 metadata:
   name: {{ .Values.area.name }}
 data:
-  SERVER_SERVLET_CONTEXT-PATH: {{ .Values.area.ingress.path }}
+  AREA_BASE_PATH: {{ .Values.area.ingress.path }}
   SPRING_DATASOURCE_URL: jdbc:postgresql://postgis:5432/therapist
