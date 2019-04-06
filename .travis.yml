@@ -16,6 +16,8 @@ jobs:
     - stage: test
       name: "Minikube Helm chart Postman tests"
       script: |
+        mkdir /home/travis/.minikube/
+        "sudo chown -R travis: /home/travis/.minikube/"
         # Download kubectl, which is a requirement for using minikube.
         curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
         # Download minikube.
@@ -23,7 +25,6 @@ jobs:
         mkdir -p $HOME/.kube $HOME/.minikube
         touch $KUBECONFIG
         sudo minikube start --vm-driver=none --kubernetes-version=v1.13.0
-        "sudo chown -R travis: /home/travis/.minikube/"
         # Following is just to demo that the kubernetes cluster works.
         kubectl cluster-info
         # Verify kube-addon-manager.
