@@ -1,52 +1,74 @@
-dist: trusty
+dist: xenial
 sudo: required
 language: java
 jdk:
   - oraclejdk8
 services:
   - docker
+env:
+  global:
+    - CHANGE_MINIKUBE_NONE_USER=true
+    - MINIKUBE_WANTUPDATENOTIFICATION=false
+    - MINIKUBE_WANTREPORTERRORPROMPT=false
+    - MINIKUBE_HOME=$HOME
+    - CHANGE_MINIKUBE_NONE_USER=true
+    - KUBECONFIG=$HOME/.kube/config
 
-matrix:
+jobs:
   include:
-  - name: "Docker Compose Test"
-    before_install:
-      - cd docker-compose
-      - docker-compose config
-      - echo "Starting Massagereleax in Docker containers"
-      - docker-compose ps
-      - docker-compose pull
-      - docker-compose up -d
-      - |
-        WAIT_INTERVAL=1
-        COUNTER=0
-        TIMEOUT=300
-        t0=`date +%s`
+    - stage: test
+      name: "Minikube Helm chart Postman tests"
+      script: |
+        # Download kubectl, which is a requirement for using minikube.
+        curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+        # Download minikube.
+        curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.35.0/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+        mkdir -p $HOME/.kube $HOME/.minikube
+        touch $KUBECONFIG
+        sudo minikube start --vm-driver=none --kubernetes-version=v1.13.0
+        "sudo chown -R travis: /home/travis/.minikube/"
+        # Following is just to demo that the kubernetes cluster works.
+        kubectl cluster-info
+        # Verify kube-addon-manager.
+        # kube-addon-manager is responsible for managing other kubernetes components, such as kube-dns, dashboard, storage-provisioner..
+        JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n kube-system get pods -lcomponent=kube-addon-manager -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for kube-addon-manager to be available"; kubectl get pods --all-namespaces; done
+        # Wait for kube-dns to be ready.
+        JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n kube-system get pods -lk8s-app=kube-dns -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for kube-dns to be available"; kubectl get pods --all-namespaces; done
+        # Enable NGINX Ingress controller for minikube
+        minikube addons enable ingress
+        # Wait for Nginx Ingress controller is running
+        JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}';
+        until kubectl -n kube-system get pods -lk8s-app=nginx-ingress -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for nginx ingress to be available"; kubectl get pods --all-namespaces; done
 
-        echo "Waiting for massagerelax area to start"
-        response=$(curl --write-out %{http_code} --output /dev/null --silent http://localhost:8082/api/therapist-areas)
-        until [ "200" -eq "$response" ] || [ "$COUNTER" -eq "$TIMEOUT" ]; do
-          printf '.'
-          sleep $WAIT_INTERVAL
-          COUNTER=$(($COUNTER+$WAIT_INTERVAL))
-          response=$(curl --write-out %{http_code} --output /dev/null --silent http://localhost:8082/api/therapist-areas)
-        done
+        # Install helm
+        curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
+        chmod 700 get_helm.sh
+        ./get_helm.sh
 
-        if (("$COUNTER" < "$TIMEOUT")) ; then
-          t1=`date +%s`
-          delta=$((($t1 - $t0)/60))
-          echo "Area started in $delta minutes"
-        else
-          echo "Waited $COUNTER seconds"
-          echo "Area could not start in time."
-          echo "The last response code from /api/therapist-areas was $response"
-          exit 1
-        fi
-    script: travis_wait 30
+        # Install helm tiller
+        helm init --service-account tiller --wait
+
+        # Install helm charts
+        pushd helm/massagerelax
+        helm dependency update
+        popd
+        helm install helm/massagerelax
+
 
 install: true
+
+before_script:
+  # Print build info that binary is compiled with.
+  - echo $TRAVIS_COMMIT
+  - echo $TRAVIS_TAG
+  - echo $TRAVIS_BRANCH
+  - echo $TRAVIS_BUILD_NUMBER
+  - echo $TRAVIS_REPO_SLUG
+  - node --version
+  - npm --version
+  - node_modules/.bin/newman --version
 
 before_install:
   # troubleshooting info in case of problems
   - docker version
   - docker info
-  - docker-compose --version
