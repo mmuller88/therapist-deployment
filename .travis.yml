@@ -33,7 +33,7 @@ jobs:
         ./get_helm.sh
 
         # Install helm tiller
-        helm init --service-account tiller --wait
+        helm init --wait
 
         # Install helm charts
         pushd helm/massagerelax
