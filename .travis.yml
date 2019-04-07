@@ -25,7 +25,7 @@ jobs:
         JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n kube-system get pods -lk8s-app=kube-dns -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for kube-dns to be available"; kubectl get pods --all-namespaces; done
         # Wait for Nginx Ingress controller is running
         JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}';
-        until kubectl -n kube-system get pods -lk8s-app=nginx-ingress -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for nginx ingress to be available"; kubectl get pods --all-namespaces; done
+        until kubectl -n kube-system get pods -lapp.kubernetes.io/name=nginx-ingress-controller -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for nginx ingress to be available"; kubectl get pods --all-namespaces; done
 
         # Install helm
         curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
