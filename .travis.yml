@@ -16,8 +16,6 @@ jobs:
     - stage: test
       name: "Minikube Helm chart Postman tests"
       script: |
-        # Enable NGINX Ingress controller for minikube
-        minikube addons enable ingress
         # Following is just to demo that the kubernetes cluster works.
         kubectl cluster-info
         # Verify kube-addon-manager.
@@ -64,6 +62,8 @@ before_script:
   - touch $KUBECONFIG
   - sudo minikube start --vm-driver=none --kubernetes-version=v1.13.0
   - "sudo chown -R travis: /home/travis/.minikube/"
+  # Enable NGINX Ingress controller for minikube
+  - minikube addons enable ingress
 
 before_install:
   # troubleshooting info in case of problems
