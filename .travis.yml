@@ -63,7 +63,7 @@ before_script:
   - sudo minikube start --vm-driver=none --kubernetes-version=v1.13.0
   - "sudo chown -R travis: /home/travis/.minikube/"
   # Enable NGINX Ingress controller for minikube
-  - minikube addons enable ingress
+  - sudo minikube addons enable ingress
 
 before_install:
   # troubleshooting info in case of problems
