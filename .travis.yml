@@ -37,7 +37,7 @@ jobs:
 
         # Install helm charts
         pushd helm/massagerelax
-        helm dependency update
+        # helm dependency update
         popd
         helm install helm/massagerelax
 
