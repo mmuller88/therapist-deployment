@@ -39,7 +39,7 @@ jobs:
         pushd helm/massagerelax
         helm dependency update
         popd
-        # helm install helm/massagerelax
+        helm install --name massagerelax helm/massagerelax
 
 install:
   - npm install newman
