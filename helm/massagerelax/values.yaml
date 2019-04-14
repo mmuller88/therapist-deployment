@@ -38,6 +38,15 @@ therapist:
     externalPort: 80
   ingress:
     path: /therapist
+readinessProbe:
+  initialDelaySeconds: 60
+  periodSeconds: 20
+  timeoutSeconds: 10
+  failureThreshold: 6
+livenessProbe:
+  initialDelaySeconds: 130
+  periodSeconds: 20
+  timeoutSeconds: 10
 
 mysql:
   replicaCount: 1

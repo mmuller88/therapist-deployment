@@ -26,7 +26,7 @@ jobs:
         - JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl get nodes -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; done
         - curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
         - chmod 700 get_helm.sh
-        - DESIRED_VERSION=v2.11.0 ./get_helm.sh
+        - ./get_helm.sh
       script:
         - helm init --wait
         # Install helm charts
