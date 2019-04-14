@@ -2,13 +2,6 @@ dist: xenial
 sudo: required
 services:
   - docker
-env:
-  global:
-    - MINIKUBE_WANTUPDATENOTIFICATION=false
-    - MINIKUBE_WANTREPORTERRORPROMPT=false
-    - MINIKUBE_HOME=$HOME
-    - CHANGE_MINIKUBE_NONE_USER=true
-    - KUBECONFIG=$HOME/.kube/config
 
 jobs:
   include:
@@ -35,6 +28,11 @@ jobs:
         - DESIRED_VERSION=v2.11.0 ./get_helm.sh
       script:
         - helm init --wait
+        # Install helm charts
+        - pushd helm/massagerelax
+        - helm dependency update
+        - popd
+        - helm install --name massagerelax helm/massagerelax
 
 #      script: |
 #        # Following is just to demo that the kubernetes cluster works.
