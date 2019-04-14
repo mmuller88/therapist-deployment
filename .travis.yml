@@ -10,6 +10,7 @@ jobs:
       env:
         - CHANGE_MINIKUBE_NONE_USER=true
         - KUBERNETES_VERSION=v1.13.0
+        - NAMESPACE=mr
       install:
         - sudo apt-get update
         - sudo apt-get install -y socat
@@ -32,7 +33,8 @@ jobs:
         - pushd helm/massagerelax
         - helm dependency update
         - popd
-        - helm install --name massagerelax helm/massagerelax
+        - helm install --name massagerelax helm/massagerelax --namespace ${NAMESPACE}
+        - JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n ${NAMESPACE} get pods -lapp=therapist -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for massagerelax to be available"; kubectl get pods --all-namespaces; done
 
 #      script: |
 #        # Following is just to demo that the kubernetes cluster works.
