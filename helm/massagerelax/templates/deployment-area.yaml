@@ -20,3 +20,19 @@ spec:
                 name: {{ .Values.area.name }}
           ports:
             - containerPort: {{ .Values.area.image.internalPort }}
+          readinessProbe:
+            httpGet:
+              path: /api/therapist-areas
+              port: {{ .Values.area.image.internalPort }}
+          initialDelaySeconds: {{ .Values.area.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.area.readinessProbe.periodSeconds }}
+          failureThreshold: {{ .Values.area.readinessProbe.failureThreshold }}
+          timeoutSeconds: {{ .Values.area.readinessProbe.timeoutSeconds }}
+          livenessProbe:
+            httpGet:
+              path: /api/therapist-areas
+              port: {{ .Values.area.image.internalPort }}
+            initialDelaySeconds: {{ .Values.area.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.area.livenessProbe.periodSeconds }}
+            failureThreshold: 1
+            timeoutSeconds: {{ .Values.area.livenessProbe.timeoutSeconds }}

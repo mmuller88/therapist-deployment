@@ -2,11 +2,13 @@ dist: xenial
 sudo: required
 services:
   - docker
+node_js:
+  - "10"
 
 jobs:
   include:
     - stage: test
-      name: "Minikube Helm chart Postman tests"
+      name: "Minikube Helm chart with Postman tests"
       env:
         - CHANGE_MINIKUBE_NONE_USER=true
         - KUBERNETES_VERSION=v1.13.0
@@ -14,7 +16,12 @@ jobs:
       install:
         - sudo apt-get update
         - sudo apt-get install -y socat
+        - npm install newman
       before_script:
+        # Print build info that binary is compiled with.
+        - node --version
+        - npm --version
+        - node_modules/.bin/newman --version
         - sudo mount --make-rshared /
         - curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubectl
         - sudo chmod +x kubectl && sudo mv kubectl /usr/local/bin/
@@ -38,21 +45,12 @@ jobs:
         - MINIKUBE_IP=$(minikube ip)
         - node_modules/.bin/newman run helm/test/therapist.postman_collection.json --global-var "host=$MINIKUBE_IP" --global-var "port=80" --global-var "prefix=/therapist/api" --global-var "protocol=http"
 
-install:
-  - npm install newman
-
-before_script:
-  # Print build info that binary is compiled with.
+before_install:
+  # troubleshooting info in case of problems
+  - docker version
+  - docker info
   - echo $TRAVIS_COMMIT
   - echo $TRAVIS_TAG
   - echo $TRAVIS_BRANCH
   - echo $TRAVIS_BUILD_NUMBER
   - echo $TRAVIS_REPO_SLUG
-  - node --version
-  - npm --version
-  - node_modules/.bin/newman --version
-
-before_install:
-  # troubleshooting info in case of problems
-  - docker version
-  - docker info

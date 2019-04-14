@@ -23,6 +23,15 @@ area:
     externalPort: 8082
   ingress:
     path: /area
+  readinessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 20
+    timeoutSeconds: 10
+    failureThreshold: 6
+  livenessProbe:
+    initialDelaySeconds: 130
+    periodSeconds: 20
+    timeoutSeconds: 10
 
 therapist:
   replicaCount: 1
