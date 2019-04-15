@@ -1,3 +1,4 @@
+{{- if index .Values "area" "enabled" }}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -24,10 +25,10 @@ spec:
             httpGet:
               path: /api/therapist-areas
               port: {{ .Values.area.image.internalPort }}
-          initialDelaySeconds: {{ .Values.area.readinessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.area.readinessProbe.periodSeconds }}
-          failureThreshold: {{ .Values.area.readinessProbe.failureThreshold }}
-          timeoutSeconds: {{ .Values.area.readinessProbe.timeoutSeconds }}
+            initialDelaySeconds: {{ .Values.area.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.area.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.area.readinessProbe.failureThreshold }}
+            timeoutSeconds: {{ .Values.area.readinessProbe.timeoutSeconds }}
           livenessProbe:
             httpGet:
               path: /api/therapist-areas
@@ -36,3 +37,4 @@ spec:
             periodSeconds: {{ .Values.area.livenessProbe.periodSeconds }}
             failureThreshold: 1
             timeoutSeconds: {{ .Values.area.livenessProbe.timeoutSeconds }}
+{{- end }}

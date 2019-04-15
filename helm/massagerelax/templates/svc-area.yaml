@@ -1,3 +1,4 @@
+{{- if index .Values "area" "enabled" }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -12,3 +13,4 @@ spec:
 #      name: therapist-area
   selector:
     app: {{ .Values.area.name }}
+{{- end }}

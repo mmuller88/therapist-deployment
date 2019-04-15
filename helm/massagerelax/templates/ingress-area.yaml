@@ -1,3 +1,4 @@
+{{- if index .Values "area" "enabled" }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -17,3 +18,4 @@ spec:
             backend:
               serviceName: {{ .Values.area.name }}
               servicePort: {{ .Values.area.service.externalPort }}
+{{- end }}

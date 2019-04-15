@@ -10,6 +10,7 @@
 # Hence, setting up explicit Container memory and then assigning a percentage of it to the JVM for performance tuning.
 
 area:
+  enabled: false
   replicaCount: 1
   name: area
   image:
@@ -34,6 +35,7 @@ area:
     timeoutSeconds: 10
 
 therapist:
+  enabled: true
   replicaCount: 1
   name: therapist
   image:

@@ -1,3 +1,4 @@
+{{- if index .Values "therapist" "enabled" }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -9,3 +10,4 @@ data:
   SPRING_DATASOURCE_URL: jdbc:mysql://{{ printf "%s-%s" .Release.Name .Values.mysql.nameOverride }}:3306/{{ .Values.mysql.mysqlDatabase }}?useUnicode=yes&characterEncoding=UTF-8
   LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB: DEBUG
   LOGGING_LEVEL_ORG_HIBERNATE: ERROR
+{{- end }}

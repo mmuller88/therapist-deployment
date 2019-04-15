@@ -27,7 +27,7 @@ jobs:
         - sudo chmod +x kubectl && sudo mv kubectl /usr/local/bin/
         - curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
         - sudo chmod +x minikube && sudo mv minikube /usr/local/bin/
-        - sudo minikube start --vm-driver=none --kubernetes-version=${KUBERNETES_VERSION} --apiserver-ips 127.0.0.1 --apiserver-name localhost
+        - sudo minikube start --vm-driver=none --kubernetes-version=${KUBERNETES_VERSION}
         - # Enable NGINX Ingress controller for minikube
         - sudo minikube addons enable ingress
         - sudo chown -R travis /home/travis/.minikube/
@@ -51,7 +51,7 @@ jobs:
         - until kubectl -n ${NAMESPACE} get pods -lapp=area -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for area to be available"; kubectl get pods --all-namespaces; done
         - MINIKUBE_IP=$(minikube ip)
         - curl https://raw.githubusercontent.com/mmuller88/massagerelax-therapist/master/test/therapist.postman_collection.json > therapist.postman_collection.json
-        - node_modules/.bin/newman run therapist.postman_collection.json --global-var "host=localhost" --global-var "port=80" --global-var "prefix=/therapist/api" --global-var "protocol=http"
+        - node_modules/.bin/newman run therapist.postman_collection.json --global-var "host=$MINIKUBE_IP" --global-var "port=80" --global-var "prefix=/therapist/api" --global-var "protocol=http"
 
 before_install:
   # troubleshooting info in case of problems

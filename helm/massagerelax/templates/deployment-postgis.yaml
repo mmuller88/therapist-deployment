@@ -1,3 +1,4 @@
+{{- if index .Values "area" "enabled" }}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -26,3 +27,4 @@ spec:
         - name: postgisdb
           persistentVolumeClaim:
             claimName: postgis-pv-claim
+{{- end }}

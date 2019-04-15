@@ -1,3 +1,4 @@
+{{- if index .Values "area" "enabled" }}
 kind: PersistentVolume
 apiVersion: v1
 metadata:
@@ -27,3 +28,4 @@ spec:
   resources:
     requests:
       storage: 5Gi
+{{- end }}

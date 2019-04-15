@@ -1,3 +1,4 @@
+{{- if index .Values "area" "enabled" }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -5,3 +6,4 @@ metadata:
 data:
   AREA_BASE_PATH: {{ .Values.area.ingress.path }}
   SPRING_DATASOURCE_URL: jdbc:postgresql://postgis:5432/therapist
+{{- end }}
