@@ -48,7 +48,7 @@ jobs:
         - helm install --name massagerelax helm/massagerelax --namespace ${NAMESPACE}
         # Wait for pods are being ready
         - JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl -n ${NAMESPACE} get pods -lapp=therapist -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for therapist to be available"; kubectl get pods --all-namespaces; done
-        - until kubectl -n ${NAMESPACE} get pods -lapp=area -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for area to be available"; kubectl get pods --all-namespaces; done
+        # - until kubectl -n ${NAMESPACE} get pods -lapp=area -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for area to be available"; kubectl get pods --all-namespaces; done
         - MINIKUBE_IP=$(minikube ip)
         - curl https://raw.githubusercontent.com/mmuller88/massagerelax-therapist/master/test/therapist.postman_collection.json > therapist.postman_collection.json
         - node_modules/.bin/newman run therapist.postman_collection.json --global-var "host=$MINIKUBE_IP" --global-var "port=80" --global-var "prefix=/therapist/api" --global-var "protocol=http"
