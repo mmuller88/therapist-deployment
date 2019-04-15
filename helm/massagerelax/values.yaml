@@ -15,7 +15,7 @@ area:
   name: area
   image:
     repository: damadden88/therapist-area
-    tag: feature-kubernetes-discovery
+    tag: latest
     pullPolicy: Always
     internalPort: 8082
   service:
@@ -40,7 +40,7 @@ therapist:
   name: therapist
   image:
     repository: damadden88/therapist
-    tag: feature-kubernetes-discovery
+    tag: latest
     pullPolicy: Always
     internalPort: 8081
   service:
@@ -55,7 +55,7 @@ therapist:
     timeoutSeconds: 10
     failureThreshold: 6
   livenessProbe:
-    initialDelaySeconds: 130
+    initialDelaySeconds: 100
     periodSeconds: 20
     timeoutSeconds: 10
 
