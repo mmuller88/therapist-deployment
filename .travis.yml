@@ -43,6 +43,7 @@ jobs:
 
         # echo "> installing Tiller server component to the KinD cluster"
         - helm init --skip-refresh --upgrade --service-account tiller --wait
+        - helm repo update
 #        - kubectl create namespace "${NAMESPACE}"
 #        - kubectl -n ${NAMESPACE} create role ${NAMESPACE}:psp --verb=use --resource=podsecuritypolicy --resource-name=kube-system
 #        - kubectl -n ${NAMESPACE} create rolebinding ${NAMESPACE}:psp:default --role=${NAMESPACE}:psp --serviceaccount=${NAMESPACE}:default
