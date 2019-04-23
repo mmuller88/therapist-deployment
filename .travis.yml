@@ -13,17 +13,14 @@ jobs:
     - stage: test
       name: "Minikube Helm chart with Postman tests"
       env:
-        - CHANGE_MINIKUBE_NONE_USER=true
         - KUBERNETES_VERSION=v1.14.0
         - NAMESPACE=mr
+        - RELEASE_NAME_INGRESS=abc
       install:
-        - sudo apt-get update
-        - sudo apt-get install -y socat
+#        - sudo apt-get update
+#        - sudo apt-get install -y socat
         - npm install newman
       before_script:
-        # Print build info that binary is compiled with.
-        - node --version
-        - npm --version
         - node_modules/.bin/newman --version
         - sudo mount --make-rshared /
         - curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubectl
@@ -31,17 +28,37 @@ jobs:
         # Download and install KinD
         - go get sigs.k8s.io/kind
         - kind create cluster
-        # Set KUBECONFIG environment variable
         - export KUBECONFIG="$(kind get kubeconfig-path)"
         # Wait for nodes are running
-        - JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl get nodes -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; done
+#        - JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl get nodes -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; done
         # Wait for Nginx Ingress controller is running
-        - until kubectl -n kube-system get pods -lapp.kubernetes.io/name=nginx-ingress-controller -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for nginx ingress to be available"; kubectl get pods --all-namespaces; done
+#        - until kubectl -n kube-system get pods -lapp.kubernetes.io/name=nginx-ingress-controller -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for nginx ingress to be available"; kubectl get pods --all-namespaces; done
         - curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
         - chmod 700 get_helm.sh
         - ./get_helm.sh
       script:
-        - helm init --wait
+        # creating Tiller ServiceAccount"
+        - kubectl -n kube-system create sa tiller
+        - kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
+
+        # echo "> installing Tiller server component to the KinD cluster"
+        - helm init --skip-refresh --upgrade --service-account tiller --wait
+#        - kubectl create namespace "${NAMESPACE}"
+#        - kubectl -n ${NAMESPACE} create role ${NAMESPACE}:psp --verb=use --resource=podsecuritypolicy --resource-name=kube-system
+#        - kubectl -n ${NAMESPACE} create rolebinding ${NAMESPACE}:psp:default --role=${NAMESPACE}:psp --serviceaccount=${NAMESPACE}:default
+#        - helm init --skip-refresh --upgrade --service-account tiller --wait
+        # "Install ingress in the ${NAMESPACE} ${RELEASE_NAME_INGRESS}"
+        # Link PSP role to the ingress serviceaccount
+#        - kubectl -n ${NAMESPACE} create rolebinding ${NAMESPACE}:psp:${RELEASE_NAME_INGRESS}-nginx-ingress --role=${NAMESPACE}:psp --serviceaccount=${NAMESPACE}:${RELEASE_NAME_INGRESS}-nginx-ingress
+
+        - |
+          helm install stable/nginx-ingress --name ${RELEASE_NAME_INGRESS} \
+          --set controller.stats.enabled=true \
+          --set controller.scope.namespace=${NAMESPACE} \
+          --set rbac.create=true \
+          --namespace ${NAMESPACE}
+        # Wait for Nginx Ingress controller is running
+        - until kubectl -n ${NAMESPACE} get pods -lapp=nginx-ingress,component=controller -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for nginx ingress to be available"; kubectl get pods --all-namespaces; done
         # Install helm charts
         - pushd helm/massagerelax
         - helm dependency update
@@ -55,6 +72,8 @@ jobs:
 
 before_install:
   # troubleshooting info in case of problems
+  - node --version
+  - npm --version
   - docker version
   - docker info
   - echo $TRAVIS_COMMIT
