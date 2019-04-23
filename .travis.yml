@@ -17,8 +17,6 @@ jobs:
         - NAMESPACE=mr
         - RELEASE_NAME_INGRESS=abc
       install:
-#        - sudo apt-get update
-#        - sudo apt-get install -y socat
         - npm install newman
       before_script:
         - node_modules/.bin/newman --version
@@ -29,29 +27,16 @@ jobs:
         - go get sigs.k8s.io/kind
         - kind create cluster
         - export KUBECONFIG="$(kind get kubeconfig-path)"
-        # Wait for nodes are running
-#        - JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; until kubectl get nodes -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; done
-        # Wait for Nginx Ingress controller is running
-#        - until kubectl -n kube-system get pods -lapp.kubernetes.io/name=nginx-ingress-controller -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for nginx ingress to be available"; kubectl get pods --all-namespaces; done
         - curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
         - chmod 700 get_helm.sh
         - ./get_helm.sh
       script:
-        # creating Tiller ServiceAccount"
+        # creating Tiller ServiceAccount
         - kubectl -n kube-system create sa tiller
         - kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
-
-        # echo "> installing Tiller server component to the KinD cluster"
+        # installing Tiller server component to the KinD cluster
         - helm init --skip-refresh --upgrade --service-account tiller --wait
         - helm repo update
-#        - kubectl create namespace "${NAMESPACE}"
-#        - kubectl -n ${NAMESPACE} create role ${NAMESPACE}:psp --verb=use --resource=podsecuritypolicy --resource-name=kube-system
-#        - kubectl -n ${NAMESPACE} create rolebinding ${NAMESPACE}:psp:default --role=${NAMESPACE}:psp --serviceaccount=${NAMESPACE}:default
-#        - helm init --skip-refresh --upgrade --service-account tiller --wait
-        # "Install ingress in the ${NAMESPACE} ${RELEASE_NAME_INGRESS}"
-        # Link PSP role to the ingress serviceaccount
-#        - kubectl -n ${NAMESPACE} create rolebinding ${NAMESPACE}:psp:${RELEASE_NAME_INGRESS}-nginx-ingress --role=${NAMESPACE}:psp --serviceaccount=${NAMESPACE}:${RELEASE_NAME_INGRESS}-nginx-ingress
-
         - |
           helm install stable/nginx-ingress --name ${RELEASE_NAME_INGRESS} \
           --set controller.stats.enabled=true \
@@ -69,7 +54,7 @@ jobs:
         - until kubectl -n ${NAMESPACE} get pods -lapp=therapist -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for therapist to be available"; kubectl get pods --all-namespaces; done
         # - until kubectl -n ${NAMESPACE} get pods -lapp=area -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for area to be available"; kubectl get pods --all-namespaces; done
         - curl https://raw.githubusercontent.com/mmuller88/massagerelax-therapist/master/test/therapist.postman_collection.json > therapist.postman_collection.json
-        # - node_modules/.bin/newman run therapist.postman_collection.json --global-var "host=localhost" --global-var "port=80" --global-var "prefix=/therapist/api" --global-var "protocol=http"
+        - node_modules/.bin/newman run therapist.postman_collection.json --global-var "host=localhost" --global-var "port=80" --global-var "prefix=/therapist/api" --global-var "protocol=http"
 
 before_install:
   # troubleshooting info in case of problems
