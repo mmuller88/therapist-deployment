@@ -38,14 +38,17 @@ jobs:
         - helm init --skip-refresh --upgrade --service-account tiller --wait
         - helm repo update
         # install metallb as LoadBalancer
-        - |
-          helm install stable/metallb --name metallb \
-          --set configInline="address-pools: \
-                              - name: default \
-                                protocol: layer2 \
-                                addresses: \
-                                - 172.17.255.1-172.17.255.250" \
-          --namespace metallb-system
+#        - |
+#          helm install stable/metallb --name metallb \
+#          --set configInline="address-pools: \
+#                              - name: default \
+#                                protocol: layer2 \
+#                                addresses: \
+#                                - 172.17.255.1-172.17.255.250" \
+#          --namespace metallb-system
+        - kubectl create namespace metallb-system
+        - kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.7.3/manifests/metallb.yaml
+        - kubectl apply -f https://git.io/km-config.yaml
         - |
           helm install stable/nginx-ingress --name ${RELEASE_NAME_INGRESS} \
           --set controller.stats.enabled=true \
@@ -62,7 +65,7 @@ jobs:
         # Wait for pods are being ready
         - until kubectl -n ${NAMESPACE} get pods -lapp=therapist -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1;echo "waiting for therapist to be available"; kubectl get pods --all-namespaces; done
         - kubectl get svc -n ingress-nginx -n ${NAMESPACE}
-        - ping 172.17.255.1 -t60
+        - ping -w60 172.17.255.1
         - curl https://raw.githubusercontent.com/mmuller88/massagerelax-therapist/master/test/therapist.postman_collection.json > therapist.postman_collection.json
         - node_modules/.bin/newman run therapist.postman_collection.json --global-var "host=172.17.255.1" --global-var "port=80" --global-var "prefix=/therapist/api" --global-var "protocol=http"
 
